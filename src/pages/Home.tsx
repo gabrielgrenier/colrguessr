@@ -1,30 +1,34 @@
 import React, { useEffect, useRef, useState } from 'react';
-import emailjs from '@emailjs/browser';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useTranslation } from 'react-i18next';
 
 
 interface guess {
     red: number;
     green: number;
-    blue: number
+    blue: number;
 }
 
 function Home() {
     const [guesses, setGuesses] = useState<guess[]>([]);
     const currentColor:guess = {red:255, green:160, blue: 100};
 
-    const [red, setRed] = useState<number>(999);
-    const [green, setGreen] = useState<number>(999);
-    const [blue, setBlue] = useState<number>(999);
+    const [red, setRed] = useState<number|undefined>(undefined);
+    const [green, setGreen] = useState<number|undefined>(undefined);
+    const [blue, setBlue] = useState<number|undefined>(undefined);
 
     useEffect(() => {
-        setGuesses([{red: 100, green: 40, blue: 255}, {red: 255, green: 210, blue: 100}]);
+        //setGuesses();
     }, []);
 
     const makeGuess = () => {
+        var arrTemp = [...guesses];
         
+        if(red !== undefined && green !== undefined && blue !== undefined){
+            arrTemp.push({red: red, green: green, blue: blue});
+
+            setGuesses(arrTemp);
+        }
     }
 
     const getBorderClass = (value:number, color:string) => {
@@ -40,8 +44,8 @@ function Home() {
             case "blue":
                 diff = Math.abs(value - currentColor.blue);
                 break;
-            default:
-                diff = 9999;
+            default: 
+                diff = 999;
         }
 
         if(diff <= 10){
@@ -74,16 +78,16 @@ function Home() {
             <div className="w-full p-2 mt-2 border-2 rounded-lg border-neutral-600">
                 <div className="grid grid-cols-4 gap-4">
                     <div>
-                        <input type="number" placeholder="Red"  min={0} max={255} className="w-full px-2 py-1 text-white placeholder-white bg-red-500 rounded-full"/>
+                        <input type="number" placeholder="Red" className="w-full px-2 py-1 text-white placeholder-white bg-red-500 rounded-full" onChange={(e) => setRed(Number(e.target.value))} value={red}/>
                     </div>
                     <div>
-                        <input type="number" placeholder="Green"  min={0} max={255} className="w-full px-2 py-1 text-white placeholder-white bg-green-500 rounded-full"/>
+                        <input type="number" placeholder="Green" className="w-full px-2 py-1 text-white placeholder-white bg-green-500 rounded-full" onChange={(e) => setGreen(Number(e.target.value))} value={green}/>
                     </div>
                     <div>
-                        <input type="number" placeholder="Blue"  min={0} max={255} className="w-full px-2 py-1 text-white placeholder-white bg-blue-500 rounded-full"/>
+                        <input type="number" placeholder="Blue" className="w-full px-2 py-1 text-white placeholder-white bg-blue-500 rounded-full" onChange={(e) => setBlue(Number(e.target.value))} value={blue}/>
                     </div>
                     <div>
-                        <button className="w-full px-2 py-1 transition duration-300 rounded-full bg-neutral-500 hover:bg-neutral-400">Guess</button>
+                        <button className="w-full px-2 py-1 transition duration-300 rounded-full bg-neutral-500 hover:bg-neutral-400" onClick={() => makeGuess()}>Guess</button>
                     </div>
                 </div>
             </div>
