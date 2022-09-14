@@ -3,22 +3,24 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
-interface guess {
+interface color {
     red: number;
     green: number;
     blue: number;
 }
 
 function Home() {
-    const [guesses, setGuesses] = useState<guess[]>([]);
-    const currentColor:guess = {red:255, green:160, blue: 100};
+    const [guesses, setGuesses] = useState<color[]>([]);
+    const [currentColor, setCurrentColor] = useState<color>({red:255, green:160, blue: 100});
+    const [currentHex, setCurrentHex] = useState<string>("");
+    const [gameState, setGameState] = useState<string>("playing");
 
     const [red, setRed] = useState<number>(9999);
     const [green, setGreen] = useState<number>(9999);
     const [blue, setBlue] = useState<number>(9999);
 
     useEffect(() => {
-        //setGuesses();
+        generateRandomColor();
     }, []);
 
     const makeGuess = () => {
@@ -27,12 +29,32 @@ function Home() {
         if(red <= 255 && red >= 0 && green <= 255 && green >= 0 && blue <= 255 && blue >= 0){
             arrTemp.push({red: red, green: green, blue: blue});
             setGuesses(arrTemp);
+
+            if(Math.abs(red - currentColor.red) <= 10 && Math.abs(green - currentColor.green) <= 10 && Math.abs(green - currentColor.green) <= 10){
+                setGameState("won");
+            }
+            else if(arrTemp.length >= 8){
+                setGameState("lost");
+            }
         }
         else {
             toast.error("Color values must be between 0 and 255.", {
                 theme: 'dark'
             });
         }
+    }
+
+    const generateRandomColor = () => {
+        const hex = "#" + Math.floor(Math.random()*16777215).toString(16);
+        const rgb:color = hextToRgb(hex);
+        console.log(rgb);
+        setCurrentColor(rgb);
+        setCurrentHex(hex);
+    }
+
+    const hextToRgb = (hex:string) => {
+        var formatted = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return formatted ? {red: parseInt(formatted[1], 16), green: parseInt(formatted[2], 16), blue: parseInt(formatted[3], 16)} : {red:0, green:0, blue:0};
     }
 
     const getBorderClass = (value:number, color:string) => {
@@ -87,7 +109,7 @@ function Home() {
         {/* Playing zone */}
         <div className="pt-10 mx-auto w-96"> {/* update the width depending on the size */}
             {/* colored square */}
-            <div className="mx-auto bg-red-500 rounded-lg h-96"></div>
+            {currentHex !== "" && <div className="mx-auto rounded-lg h-96" style={{background: currentHex}}></div>}
 
             {/* Guess input */}
             <h4 className="mt-2 text-2xl text-center">Guess the color of the square.</h4>
@@ -103,8 +125,9 @@ function Home() {
                         <input type="number" placeholder="Blue" className="w-full px-2 py-1 text-white placeholder-white bg-blue-500 rounded-full" onChange={(e) => setBlue(Number(e.target.value))} />
                     </div>
                     <div>
-                        <button className="w-full px-2 py-1 transition duration-300 rounded-full bg-neutral-500 hover:bg-neutral-400 disabled:bg-neutral-700 disabled:text-neutral-500 disabled:cursor-not-allowed" onClick={() => makeGuess()} disabled={guesses.length >= 8}>
-                            {guesses.length >= 8 ? "😞" : "Guess"}
+                        <button className="w-full px-2 py-1 transition duration-300 rounded-full bg-neutral-500 hover:bg-neutral-400 disabled:bg-neutral-700 disabled:text-neutral-500 disabled:cursor-not-allowed" 
+                            onClick={() => makeGuess()} disabled={gameState.toLocaleLowerCase() === "lost" || gameState.toLocaleLowerCase() === "won"}>
+                            {gameState.toLocaleLowerCase() === "playing" ? "Guess" : (gameState.toLocaleLowerCase() === "won" ? "🎉" : "😞")}
                         </button>
                     </div>
                 </div>
