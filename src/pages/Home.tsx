@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import useWindowSize from 'react-use/lib/useWindowSize'
+import Confetti from 'react-confetti'
+
 
 interface color {
     red: number;
@@ -18,6 +21,9 @@ function Home() {
     const [red, setRed] = useState<number>(9999);
     const [green, setGreen] = useState<number>(9999);
     const [blue, setBlue] = useState<number>(9999);
+
+    const { width, height } = useWindowSize()
+
 
     useEffect(() => {
         generateRandomColor();
@@ -97,6 +103,8 @@ function Home() {
             draggable
             pauseOnHover
         />
+        
+        {gameState.toLowerCase() === "won" &&  <Confetti width={width} height={height} recycle={false} numberOfPieces={2000}/>}
         
         {/* Header */}
         <div className="px-5 py-5 border-b-2 border-neutral-700">
