@@ -36,7 +36,7 @@ function Home() {
             arrTemp.push({red: red, green: green, blue: blue});
             setGuesses(arrTemp);
 
-            if(Math.abs(red - currentColor.red) <= 10 && Math.abs(green - currentColor.green) <= 10 && Math.abs(green - currentColor.green) <= 10){
+            if(Math.abs(red - currentColor.red) <= 10 && Math.abs(green - currentColor.green) <= 10 && Math.abs(blue - currentColor.blue) <= 10){
                 setGameState("won");
             }
             else if(arrTemp.length >= 8){
