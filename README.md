@@ -1,2 +1,4 @@
 # colrguessr
-a color picking game based on wordle
+Color guessing game based on Wordle.
+
+Demo : https://gabrielgrenier.github.io/colrguessr/
