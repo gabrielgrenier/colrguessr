@@ -24,7 +24,7 @@ function Home() {
     const [red, setRed] = useState<number>(9999);
     const [green, setGreen] = useState<number>(9999);
     const [blue, setBlue] = useState<number>(9999);
-    const [isTutorialModalOpen, setIsTutorialModalOpen] = React.useState(true);
+    const [isTutorialModalOpen, setIsTutorialModalOpen] = React.useState(false);
 
     const [playedDates, setPlayedDates] = useLocalStorage<string[]>("playedDates", []);
     const [playedGames, setPlayedGames] = useLocalStorage<Game[]>("playedGames", []);
