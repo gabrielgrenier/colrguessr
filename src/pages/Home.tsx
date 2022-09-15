@@ -4,44 +4,105 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from 'react-confetti'
+import { useLocalStorage } from 'react-use';
 
 
-interface color {
+interface Color {
     red: number;
     green: number;
     blue: number;
 }
 
-function Home() {
-    const [guesses, setGuesses] = useState<color[]>([]);
-    const [currentColor, setCurrentColor] = useState<color>({red:255, green:160, blue: 100});
-    const [currentHex, setCurrentHex] = useState<string>("");
-    const [gameState, setGameState] = useState<string>("playing");
+interface Game {
+    date: string;
+    state: string;
+}
 
+function Home() {
     const [red, setRed] = useState<number>(9999);
     const [green, setGreen] = useState<number>(9999);
     const [blue, setBlue] = useState<number>(9999);
 
-    const { width, height } = useWindowSize()
+    const [playedDates, setPlayedDates] = useLocalStorage<string[]>("playedDates", []);
+    const [playedGames, setPlayedGames] = useLocalStorage<Game[]>("playedGames", []);
+    const [currentColor, setCurrentColor] = useLocalStorage<Color>("currentColor", {red:255, green:160, blue: 100});
+    const [currentHex, setCurrentHex] = useLocalStorage<string>("currentHext", "#FFA064");
+    const [guesses, setGuesses] = useLocalStorage<Color[]>("guesses", []);
+
+    const { width, height } = useWindowSize();
 
 
     useEffect(() => {
-        generateRandomColor();
+        //console.log(playedDates);
+        //console.log(currentColor);
+        //console.log(playedGames);
+        //getCurrentGameState();
+        
+        //const today = new Date().toLocaleDateString("en-US");
+        //setPlayedDates([]);
+        //setPlayedGames([]);
+        
+        var todayD = new Date();
+        todayD.setDate(todayD.getDate());
+
+        const today = todayD.toLocaleDateString("en-US");
+        
+        var datesTemp = playedDates !== undefined ? [...playedDates] : [];
+        var gamesTemp = playedGames !== undefined ? [...playedGames] : [];
+
+        //If it's a new day
+        if(!datesTemp.includes(today)){
+            console.log("ici");
+            
+            //add today's date to the list
+            datesTemp.push(today);
+            setPlayedDates(datesTemp);
+
+            //add a new game to the histoy
+            gamesTemp.push({date: today, state:"playing"});
+            setPlayedGames(gamesTemp);
+
+            //Generate the color for the day
+            generateRandomColor();
+
+            //reset the guesses
+            setGuesses([]);
+        }
+
+        
     }, []);
 
+    const getCurrentGameState = () => {
+        return playedGames?.find((game:Game) => game.date === (new Date()).toLocaleDateString("en-US"))?.state; //Could use playedGames[platedGames.length()-1], but safer this way
+    }
+
+    const setCurrentGameState = (state:string) => {
+        var gamesTemp = playedGames !== undefined ? [...playedGames] : [];
+        const index = gamesTemp.findIndex((game:Game) => game.date === (new Date()).toLocaleDateString("en-US"));
+        
+        gamesTemp[index].state = state;
+        setPlayedGames(gamesTemp);
+    }
+
+
+
     const makeGuess = () => {
-        var arrTemp = [...guesses];
+        var arrTemp = guesses !== undefined ? [...guesses] : [];
         
         if(red <= 255 && red >= 0 && green <= 255 && green >= 0 && blue <= 255 && blue >= 0){
             arrTemp.push({red: red, green: green, blue: blue});
             setGuesses(arrTemp);
 
-            if(Math.abs(red - currentColor.red) <= 10 && Math.abs(green - currentColor.green) <= 10 && Math.abs(blue - currentColor.blue) <= 10){
-                setGameState("won");
+            if(currentColor){
+
+                if(Math.abs(red - currentColor.red) <= 10 && Math.abs(green - currentColor.green) <= 10 && Math.abs(blue - currentColor.blue) <= 10){
+                    setCurrentGameState("won");
+                }
+                else if(arrTemp.length >= 8){
+                    setCurrentGameState("lost");
+                }
             }
-            else if(arrTemp.length >= 8){
-                setGameState("lost");
-            }
+
         }
         else {
             toast.error("Color values must be between 0 and 255.", {
@@ -52,8 +113,9 @@ function Home() {
 
     const generateRandomColor = () => {
         const hex = "#" + Math.floor(Math.random()*16777215).toString(16);
-        const rgb:color = hextToRgb(hex);
+        const rgb:Color = hextToRgb(hex);
         console.log(rgb);
+        
         setCurrentColor(rgb);
         setCurrentHex(hex);
     }
@@ -64,20 +126,20 @@ function Home() {
     }
 
     const getBorderClass = (value:number, color:string) => {
-        var diff:number;
+        var diff:number = 999;
         
-        switch(color){
-            case "red":
-                diff = Math.abs(value - currentColor.red);
-                break;
-            case "green":
-                diff = Math.abs(value - currentColor.green);
-                break;
-            case "blue":
-                diff = Math.abs(value - currentColor.blue);
-                break;
-            default: 
-                diff = 999;
+        if(currentColor){
+            switch(color){
+                case "red":
+                    diff = Math.abs(value - currentColor.red);
+                    break;
+                case "green":
+                    diff = Math.abs(value - currentColor.green);
+                    break;
+                case "blue":
+                    diff = Math.abs(value - currentColor.blue);
+                    break;
+            }
         }
 
         if(diff <= 10){
@@ -104,7 +166,7 @@ function Home() {
             pauseOnHover
         />
         
-        {gameState.toLowerCase() === "won" &&  <Confetti width={width} height={height} recycle={false} numberOfPieces={2000}/>}
+        {getCurrentGameState() === "won" &&  <Confetti width={width-20} height={height} recycle={false} numberOfPieces={2000}/>}
         
         {/* Header */}
         <div className="px-5 py-5 border-b-2 border-neutral-700">
@@ -134,14 +196,14 @@ function Home() {
                     </div>
                     <div>
                         <button className="w-full px-2 py-1 transition duration-300 rounded-full bg-neutral-500 hover:bg-neutral-400 disabled:bg-neutral-700 disabled:text-neutral-500 disabled:cursor-not-allowed" 
-                            onClick={() => makeGuess()} disabled={gameState.toLocaleLowerCase() === "lost" || gameState.toLocaleLowerCase() === "won"}>
-                            {gameState.toLocaleLowerCase() === "playing" ? "Guess" : (gameState.toLocaleLowerCase() === "won" ? "🎉" : "😞")}
+                            onClick={() => makeGuess()} disabled={getCurrentGameState() === "lost" || getCurrentGameState() === "won"}>
+                            {getCurrentGameState() === "playing" ? "Guess" : (getCurrentGameState() === "won" ? "🎉" : "😞")}
                         </button>
                     </div>
                 </div>
             </div>
 
-            {guesses.length > 0 && <div className="grid grid-cols-4 gap-4 px-2 pt-10 text-center">
+            {guesses && guesses.length > 0 && <div className="grid grid-cols-4 gap-4 px-2 pt-10 text-center">
                 <p>Red</p>
                 <p>Green</p>
                 <p>Blue</p>
@@ -149,7 +211,7 @@ function Home() {
             </div>}
 
             {/* Guesses */}
-            {guesses.map((guess, index) => <div className={`w-full p-2 border-2 rounded-lg border-neutral-600 ${index === 0 ? "" : "mt-5"}`} key={index}>
+            {guesses && guesses.map((guess, index) => <div className={`w-full p-2 border-2 rounded-lg border-neutral-600 ${index === 0 ? "" : "mt-5"}`} key={index}>
                 <div className="grid grid-cols-4 gap-4">
                     <div>
                         <div className={`w-full py-0.5 border-2 rounded-full  ${getBorderClass(guess.red, "red")}`}>
