@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from 'react-confetti'
 import { useLocalStorage } from 'react-use';
+import Modal from 'react-modal';
 
 
 interface Color {
@@ -16,12 +17,14 @@ interface Color {
 interface Game {
     date: string;
     state: string;
+    //Need to add the guesses here, color, hex, etc => add a game history
 }
 
 function Home() {
     const [red, setRed] = useState<number>(9999);
     const [green, setGreen] = useState<number>(9999);
     const [blue, setBlue] = useState<number>(9999);
+    const [isTutorialModalOpen, setIsTutorialModalOpen] = React.useState(true);
 
     const [playedDates, setPlayedDates] = useLocalStorage<string[]>("playedDates", []);
     const [playedGames, setPlayedGames] = useLocalStorage<Game[]>("playedGames", []);
@@ -30,6 +33,12 @@ function Home() {
     const [guesses, setGuesses] = useLocalStorage<Color[]>("guesses", []);
 
     const { width, height } = useWindowSize();
+
+    const modalStyle = {
+        overlay: {
+            backgroundColor: 'rgba(20, 20, 20, 0.75)'
+        }
+      };
 
 
     useEffect(() => {
@@ -165,15 +174,90 @@ function Home() {
             draggable
             pauseOnHover
         />
+
+        <Modal
+            isOpen={isTutorialModalOpen}
+            //onAfterOpen={afterOpenModal}
+            //onRequestClose={closeModal}
+            style={modalStyle}
+            contentLabel="Example Modal"
+            className="px-10 py-3 mx-auto mt-10 border-2 rounded-lg outline-none bg-neutral-900 w-96 border-neutral-700"
+        >
+            <div className="mb-3">
+                <button className="float-right text-xl font-bold transition duration-300 hover:text-red-400" onClick={() => setIsTutorialModalOpen(false)}>
+                    X
+                </button>
+                <h1 className="text-xl font-semibold text-center">HOW TO PLAY</h1>
+            </div>
+            <div className="">
+                <p>You need to guess the color in <strong> 8 tries.</strong></p>
+                <p className="mt-3">Each color value is set between <strong>0</strong> and <strong>255</strong>.</p>
+                <p className="mt-3">If your guess is within 10 units, it counts as valid.</p>
+                <p className="mt-3">Border definitions: </p>
+                <ul className="ml-10 list-disc">
+                    <li><span className="font-semibold text-green-500">Green:</span> value within 10 units</li>
+                    <li><span className="font-semibold text-yellow-500">Yellow:</span> value within 50 units</li>
+                    <li><span className="font-semibold text-neutral-600">Gray:</span> value over 50 units </li>
+                </ul>
+
+                <h4 className="mt-3 text-lg font-semibold">Exemple : </h4>
+                <div className="mt-3">
+                    <div className="grid grid-cols-3 gap-4 px-2 text-center">
+                        <p>Red</p>
+                        <p>Green</p>
+                        <p>Blue</p>
+                    </div>
+                    <div className={`w-full p-2 border-2 rounded-lg border-neutral-600`}>
+                        <div className="grid grid-cols-3 gap-4">
+                            <div>
+                                <div className={`w-full py-0.5 border-2 rounded-full border-green-500`}>
+                                    <p className="text-center mt-0.5">255</p>
+                                </div>
+                            </div>
+                            <div>
+                                <div className={`w-full py-0.5 border-2 rounded-full border-yellow-500`}>
+                                    <p className="text-center mt-0.5">100</p>
+                                </div>
+                            </div>
+                            <div>
+                                <div className={`w-full py-0.5 border-2 rounded-full border-neutral-700`}>
+                                    <p className="text-center mt-0.5">50</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-3">
+                        <p>The red value is <span className="font-semibold text-green-500">valid.</span></p>
+                        <p>The green value is <span className="font-semibold text-yellow-500">within 50 units.</span></p>
+                        <p>The blue value is <span className="font-semibold text-neutral-600">over 50 units.</span></p>
+                    </div>
+                </div>
+
+                <div className="mt-5 text-center">
+                    <button className="px-5 transition duration-300 border-2 rounded-full hover:bg-white hover:text-neutral-900" onClick={() => setIsTutorialModalOpen(false)}>
+                        OK!
+                    </button>
+                </div>
+
+
+            </div>
+ 
+        </Modal>
         
         {getCurrentGameState() === "won" &&  <Confetti width={width-20} height={height} recycle={false} numberOfPieces={2000}/>}
         
         {/* Header */}
         <div className="px-5 py-5 border-b-2 border-neutral-700">
-            <div className="float-right w-10 h-10 pt-0.5 text-3xl text-center rounded-full bg-neutral-600 hover:cursor-pointer hover:bg-neutral-300 transition duration-300">
-                ?
-            </div>
             <h1 className="text-3xl font-bold text-center">COLR_GUESSR</h1>
+
+            {/* buttons div */}
+            <div className="float-right -mt-9">
+                <button className="w-10 h-10 pt-0.5 text-3xl text-center rounded-full bg-neutral-600 hover:cursor-pointer hover:bg-neutral-300 transition duration-300" onClick={() => setIsTutorialModalOpen(true)}>
+                    ?
+                </button>
+            </div>
+
         </div>
 
         {/* Playing zone */}
