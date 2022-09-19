@@ -261,7 +261,7 @@ function Home() {
         </div>
 
         {/* Playing zone */}
-        <div className="pt-10 mx-auto sm:w-96 w-80"> {/* update the width depending on the size */}
+        <div className="py-10 mx-auto sm:w-96 w-80"> {/* update the width depending on the size */}
             {/* colored square */}
             {currentHex !== "" && <div className="mx-auto rounded-lg sm:h-96 h-80" style={{background: currentHex}}></div>}
 
