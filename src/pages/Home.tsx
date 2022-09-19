@@ -181,7 +181,7 @@ function Home() {
             //onRequestClose={closeModal}
             style={modalStyle}
             contentLabel="Example Modal"
-            className="px-10 py-3 mx-auto mt-10 border-2 rounded-lg outline-none bg-neutral-900 w-96 border-neutral-700"
+            className="px-2 py-3 mx-auto mt-10 border-2 rounded-lg outline-none sm:px-10 bg-neutral-900 sm:w-96 w-80 border-neutral-700"
         >
             <div className="mb-3">
                 <button className="float-right text-xl font-bold transition duration-300 hover:text-red-400" onClick={() => setIsTutorialModalOpen(false)}>
@@ -249,11 +249,11 @@ function Home() {
         
         {/* Header */}
         <div className="px-5 py-5 border-b-2 border-neutral-700">
-            <h1 className="text-3xl font-bold text-center">COLR_GUESSR</h1>
+            <h1 className="text-2xl font-bold text-center sm:text-3xl">COLR_GUESSR</h1>
 
             {/* buttons div */}
             <div className="float-right -mt-9">
-                <button className="w-10 h-10 pt-0.5 text-3xl text-center rounded-full bg-neutral-600 hover:cursor-pointer hover:bg-neutral-300 transition duration-300" onClick={() => setIsTutorialModalOpen(true)}>
+                <button className="w-10 h-10 pt-0.5 -mt-0.5 text-3xl text-center rounded-full bg-neutral-600 hover:cursor-pointer hover:bg-neutral-300 transition duration-300" onClick={() => setIsTutorialModalOpen(true)}>
                     ?
                 </button>
             </div>
@@ -261,9 +261,9 @@ function Home() {
         </div>
 
         {/* Playing zone */}
-        <div className="pt-10 mx-auto w-96"> {/* update the width depending on the size */}
+        <div className="pt-10 mx-auto sm:w-96 w-80"> {/* update the width depending on the size */}
             {/* colored square */}
-            {currentHex !== "" && <div className="mx-auto rounded-lg h-96" style={{background: currentHex}}></div>}
+            {currentHex !== "" && <div className="mx-auto rounded-lg sm:h-96 h-80" style={{background: currentHex}}></div>}
 
             {/* Guess input */}
             <h4 className="mt-2 text-2xl text-center">Guess the color of the square.</h4>
