@@ -295,7 +295,7 @@ function Home() {
             </div>}
 
             {/* Guesses */}
-            {guesses && guesses.map((guess, index) => <div className={`w-full p-2 border-2 rounded-lg border-neutral-600 ${index === 0 ? "" : "mt-5"}`} key={index}>
+            {guesses && [...guesses].reverse().map((guess, index) => <div className={`w-full p-2 border-2 rounded-lg border-neutral-600 ${index === 0 ? "" : "mt-5"}`} key={index}>
                 <div className="grid grid-cols-4 gap-4">
                     <div>
                         <div className={`w-full py-0.5 border-2 rounded-full  ${getBorderClass(guess.red, "red")}`}>
@@ -313,7 +313,7 @@ function Home() {
                         </div>
                     </div>
                     <div>
-                        <p className="mt-1.5 text-center text-neutral-400">{index+1} / 8</p>
+                        <p className="mt-1.5 text-center text-neutral-400">{guesses.length-index} / 8</p>
                     </div>
                 </div>
             </div>)}
