@@ -11,9 +11,9 @@ import Modal from 'react-modal';
 
 
 function Home() {
-    const [red, setRed] = useState<number>(9999);
-    const [green, setGreen] = useState<number>(9999);
-    const [blue, setBlue] = useState<number>(9999);
+    const [red, setRed] = useState<number|undefined>(undefined);
+    const [green, setGreen] = useState<number|undefined>(undefined);
+    const [blue, setBlue] = useState<number|undefined>(undefined);
     const [isTutorialModalOpen, setIsTutorialModalOpen] = React.useState(false);
 
     const [playedDates, setPlayedDates] = useLocalStorage<string[]>("playedDates", []);
@@ -24,11 +24,6 @@ function Home() {
 
     const { width, height } = useWindowSize();
 
-    const modalStyle = {
-        overlay: {
-            backgroundColor: 'rgba(20, 20, 20, 0.75)'
-        }
-      };
 
 
     useEffect(() => {
@@ -51,8 +46,6 @@ function Home() {
 
         //If it's a new day
         if(!datesTemp.includes(today)){
-            console.log("ici");
-            
             //add today's date to the list
             datesTemp.push(today);
             setPlayedDates(datesTemp);
@@ -88,23 +81,29 @@ function Home() {
     const makeGuess = () => {
         var arrTemp = guesses !== undefined ? [...guesses] : [];
         
-        if(red <= 255 && red >= 0 && green <= 255 && green >= 0 && blue <= 255 && blue >= 0){
-            arrTemp.push({red: red, green: green, blue: blue});
-            setGuesses(arrTemp);
+        if(red && green && blue){
+            if(red <= 255 && red >= 0 && green <= 255 && green >= 0 && blue <= 255 && blue >= 0){
+                arrTemp.push({red: red, green: green, blue: blue});
+                setGuesses(arrTemp);
 
-            if(currentColor){
+                if(currentColor){
 
-                if(Math.abs(red - currentColor.red) <= 10 && Math.abs(green - currentColor.green) <= 10 && Math.abs(blue - currentColor.blue) <= 10){
-                    setCurrentGameState("won");
-                }
-                else if(arrTemp.length >= 8){
-                    setCurrentGameState("lost");
+                    if(Math.abs(red - currentColor.red) <= 10 && Math.abs(green - currentColor.green) <= 10 && Math.abs(blue - currentColor.blue) <= 10){
+                        setCurrentGameState("won");
+                    }
+                    else if(arrTemp.length >= 8){
+                        setCurrentGameState("lost");
+                    }
                 }
             }
-
+            else {
+                toast.error("Color values must be between 0 and 255.", {
+                    theme: 'dark'
+                });
+            }
         }
         else {
-            toast.error("Color values must be between 0 and 255.", {
+            toast.error("Color values can't be empty.", {
                 theme: 'dark'
             });
         }
@@ -220,7 +219,7 @@ function Home() {
             pauseOnHover
         />
 
-        <Modal isOpen={isTutorialModalOpen} style={modalStyle} contentLabel="Example Modal" className="px-2 py-3 mx-auto mt-10 border-2 rounded-lg outline-none sm:px-10 bg-neutral-900 sm:w-96 w-80 border-neutral-700">
+        <Modal isOpen={isTutorialModalOpen} style={{overlay: { backgroundColor: 'rgba(20, 20, 20, 0.75)'}}} contentLabel="Example Modal" className="px-2 py-3 mx-auto mt-10 border-2 rounded-lg outline-none sm:px-10 bg-neutral-900 sm:w-96 w-80 border-neutral-700">
             <div className="mb-3">
                 <button className="float-right text-xl font-bold transition duration-300 hover:text-red-400" onClick={() => setIsTutorialModalOpen(false)}>
                     X
