@@ -123,34 +123,6 @@ function Home() {
         return formatted ? {red: parseInt(formatted[1], 16), green: parseInt(formatted[2], 16), blue: parseInt(formatted[3], 16)} : {red:0, green:0, blue:0};
     }
 
-    const getBorderClass = (value:number, color:string) => {
-        var diff:number = 999;
-        
-        if(currentColor){
-            switch(color){
-                case "red":
-                    diff = Math.abs(value - currentColor.red);
-                    break;
-                case "green":
-                    diff = Math.abs(value - currentColor.green);
-                    break;
-                case "blue":
-                    diff = Math.abs(value - currentColor.blue);
-                    break;
-            }
-        }
-
-        if(diff <= 10){
-            return "border-green-500";
-        }
-        else if(diff <= 50){
-            return "border-yellow-500";
-        }
-        else {
-            return "border-neutral-700";
-        }
-    }
-
     return <>
         
         {getCurrentGameState() === "won" &&  <Confetti width={width-20} height={height} recycle={false} numberOfPieces={1500}/>}
@@ -173,7 +145,14 @@ function Home() {
             {currentHex !== "" && <div className="mx-auto rounded-lg sm:h-96 h-80" style={{background: currentHex}}></div>}
 
             {/* Guess input */}
-            <h4 className="mt-2 text-2xl text-center">Guess the color of the square.</h4>
+            <h4 className="mt-2 text-2xl text-center">
+                {getCurrentGameState() === "playing" && "Guess the color of the square."}
+                {getCurrentGameState() === "won" && "Winner winner chicken dinner!"}
+                {getCurrentGameState() === "lost" && "... Are you colorblind?"}
+            </h4>
+            {getCurrentGameState() !== "playing" && <div>
+                {/* faire le code pour afficher les valeurs de couleurs et hexcode copy to clip board*/}
+            </div>}
             <div className="w-full p-2 mt-2 border-2 rounded-lg border-neutral-600">
                 <div className="grid grid-cols-4 gap-4">
                     <div>
